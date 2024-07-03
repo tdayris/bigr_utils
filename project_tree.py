@@ -54,20 +54,45 @@ def walkthrough(directory: Path, tree: Tree, skip_hidden: bool = False) -> None:
             elif path.suffix in (".png", ".svg", ".pdf"):
                 icon = ":bar_chart:"
                 description += "Chart image"
-            elif path.suffix in (".md"):
+            elif path.suffix in (".md", ".rst", ".txt"):
                 icon = ":regional_indicator_m:"
                 description += "Text ressource"
-            elif path.suffix in (".R", ".Rmd"):
+            elif path.suffix in (".rst", ".txt"):
+                icon = ":regional_indicator_t:"
+                description += "Text ressource"
+            elif path.suffix in (".R", ".Rmd", ".r", ".rmd"):
                 icon = ":regional_indicator_r:"
                 description += "R script"
-            elif path.suffix in (".sh", ".bash", ".sbatch"):
+            elif path.suffix in (".sh", ".bash", ".sbatch", ".zsh"):
                 icon = ":scroll:"
                 description += "Shell script"
             elif path.suffix in (".csv", ".tsv", ".xlsx"):
                 icon = ":input_numbers:"
                 description += "Table"
             elif path.suffix in (".bam", ".sam", ".cram", ".bai"):
-                description = "Alignment file"
+                icon = ":dna:"
+                description += "Alignment file"
+            elif path.suffix in (".json", ".yaml", ".yml"):
+                icon = ":receipt:"
+                description += "Configuration file"
+            elif path.name.endswith((".fq", ".fastq", ".fq.gz", ".fastq.gz")):
+                icon = ":dna:"
+                description += "Sequenced reads"
+            elif path.name.endswith((".bed", ".bed.gz", ".gtf", ".gff", ".gff3")):
+                icon = ":input_numbers:"
+                description += "Genomic intervals"
+            elif path.name.endswith((".fasta", ".fa", ".fna", ".fai", ".dict", ".bt2")):
+                icon = ":dna:"
+                description += "Genomic sequences"
+            elif path.suffix == ".html":
+                icon = ":globe_showing_europe-africa:"
+                description += "HTML report"
+            elif path.name.endswith((".bcf", ".vcf", ".vcf.gz", ".gvcf", ".gvcf.gz", ".maf", ".vcf.gz.tbi", ".vcf.gz.csi", ".ubcf")):
+                icon = ":dna:"
+                description += "Variants description"
+            elif path.suffix == ".bin":
+                icon = ":computer_disk:"
+                description += "Binary file"
             else:
                 description = ""
 
@@ -88,7 +113,8 @@ def check_path(path: str) -> None:
 
 @click.command(context_settings={"show_default": True})
 @click.option("-d", "--directory", default=os.getcwd(), type=click.Path())
-def tree(directory: str = os.getcwd()) -> None:
+@click.option("-s", "--skip_hidden", is_flag=True, default=False)
+def tree(directory: str = os.getcwd(), skip_hidden: bool = False) -> None:
     """Produce an annotated tree of the target directory"""
     console = Console()
 
@@ -105,7 +131,7 @@ def tree(directory: str = os.getcwd()) -> None:
         f":open_file_folder: [link file://{directory}]{directory}",
         guide_style="cyan"
     )
-    walkthrough(directory, tree)
+    walkthrough(directory, tree, skip_hidden)
     print(tree)
 
 if __name__ == "__main__":
