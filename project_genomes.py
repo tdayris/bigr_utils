@@ -20,6 +20,7 @@ def check_path(path: str) -> None:
 )
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Increase verbosity")
 @click.option("-f", "--force", is_flag=True, default=False, help="Force over-writing")
+@click.option("-e", "--empty", is_flag=True, default=False, help="Produce an empty genome file")
 @click.help_option("-h", "--help")
 def configure_genomes(
     output: str = f"{os.getcwd()}/config/genomes.csv",
@@ -169,9 +170,150 @@ def configure_genomes(
         "gwascatalog": "",
         "wikipathway": "",
     }
+    
+    # Known paths to mouse recent resources
+    mus_musculus_grcm39_109: dict[str, str] = {
+        # Genome information
+        "species": "mus_musculus",
+        "build": "GRCm39",
+        "release": "109",
+        "origin": "Ensembl",
+        # DNA sequences
+        "dna_fasta": "",
+        "dna_fai": "",
+        "dna_dict": "",
+        # cDNA sequences
+        "cdna_fasta": "",
+        "cdna_fai": "",
+        "cdna_dict": "",
+        # Transcript sequences
+        "transcripts_fasta": "",
+        "transcripts_fai": "",
+        "transcripts_dict": "", 
+        # Known variants
+        "af_only": "",
+        "af_only_tbi": "",
+        "dbsnp": "",
+        "dbsnp_tbi": "",
+        # Gene annotations
+        "gtf": "",
+        "gff3": "",
+        # Reformatting
+        "id_to_gene": "",
+        "t2g": "",
+        "genepred": "",
+        "genepred_bed": "",
+        # Known blacklists
+        "blacklist": "",
+        # Bowtie2 indexes
+        "bowtie2_dna_index": "",
+        "bowtie2_transcripts_index": "",
+        "bowtie2_cdna_index": "",
+        # Salmon index
+        "salmon_index": "",
+        # Variant databases
+        "CancerGeneCensus": "",
+        "clinvar": "",
+        "clinvar_tbi": "",
+        "cosmic": "",
+        "cosmic_tbi": "",
+        "dbnsfp": "",
+        "dbnsfp_tbi": "",
+        "dbvar": "",
+        "dbvar_tbi": "",
+        "exac": "",
+        "exac_tbi": "",
+        "kaviar": "",
+        "kaviar_tbi": "",
+        "oncokb": "",
+        # Pathways and genes sets
+        "CORUM": "",
+        "msigdb_c1": "",
+        "msigdb_c2": "",
+        "msigdb_c3": "",
+        "msigdb_c4": "",
+        "msigdb_c5": "",
+        "msigdb_c6": "",
+        "msigdb_c7": "",
+        "msigdb_c8": "",
+        "msigdb_h": "",
+        "gwascatalog": "",
+        "wikipathway": "",
+    }
+    
+    # Known paths to old human resources
+    homo_sapiens_grch37_75: dict[str, str] = {
+        # Genome information
+        "species": "mus_musculus",
+        "build": "GRCh37",
+        "release": "75",
+        "origin": "Ensembl",
+        # DNA sequences
+        "dna_fasta": "",
+        "dna_fai": "",
+        "dna_dict": "",
+        # cDNA sequences
+        "cdna_fasta": "",
+        "cdna_fai": "",
+        "cdna_dict": "",
+        # Transcript sequences
+        "transcripts_fasta": "",
+        "transcripts_fai": "",
+        "transcripts_dict": "", 
+        # Known variants
+        "af_only": "",
+        "af_only_tbi": "",
+        "dbsnp": "",
+        "dbsnp_tbi": "",
+        # Gene annotations
+        "gtf": "",
+        "gff3": "",
+        # Reformatting
+        "id_to_gene": "",
+        "t2g": "",
+        "genepred": "",
+        "genepred_bed": "",
+        # Known blacklists
+        "blacklist": "",
+        # Bowtie2 indexes
+        "bowtie2_dna_index": "",
+        "bowtie2_transcripts_index": "",
+        "bowtie2_cdna_index": "",
+        # Salmon index
+        "salmon_index": "",
+        # Variant databases
+        "CancerGeneCensus": "",
+        "clinvar": "",
+        "clinvar_tbi": "",
+        "cosmic": "",
+        "cosmic_tbi": "",
+        "dbnsfp": "",
+        "dbnsfp_tbi": "",
+        "dbvar": "",
+        "dbvar_tbi": "",
+        "exac": "",
+        "exac_tbi": "",
+        "kaviar": "",
+        "kaviar_tbi": "",
+        "oncokb": "",
+        # Pathways and genes sets
+        "CORUM": "",
+        "msigdb_c1": "",
+        "msigdb_c2": "",
+        "msigdb_c3": "",
+        "msigdb_c4": "",
+        "msigdb_c5": "",
+        "msigdb_c6": "",
+        "msigdb_c7": "",
+        "msigdb_c8": "",
+        "msigdb_h": "",
+        "gwascatalog": "",
+        "wikipathway": "",
+    }
+
 
     # Check each single paths provided
-    for genome in [homo_sapiens_grch38_109, mus_musculus_grcm38_99]:
+    for genome in [homo_sapiens_grch38_109, mus_musculus_grcm38_99, mus_musculus_grcm39_109, homo_sapiens_grch37_75]:
         for descriptor, file_path in genome.items():
             if descriptor in ["species", "build", "release", "origin"]:
                 continue  # Skip genome descriptor
@@ -187,6 +329,11 @@ def configure_genomes(
 
     # Save valid paths
     genomes = DataFrame.from_records([homo_sapiens_grch38_109, mus_musculus_grcm38_99])
+
+    # On user request, remove known files
+    if empty is True:
+        genomes = genomes[["species", "build", "release"]]
+
     if os.path.exists(output) and (force is False):
         console.print(":warning: A genome file already exists")
     else:

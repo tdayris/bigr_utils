@@ -31,7 +31,7 @@ def walkthrough(directory: Path, tree: Tree, skip_hidden: bool = False) -> None:
 
         if path.is_dir():
             branch = tree.add(
-                f":open_file_folder: [link file://{path}]{escape(path.name)}",
+                f":open_file_folder: [link file://{path.resolve()}]{escape(path.name)}",
                 style="green",
                 guide_style="cyan",
             )
@@ -99,7 +99,7 @@ def walkthrough(directory: Path, tree: Tree, skip_hidden: bool = False) -> None:
             size: str = str(decimal(path.stat().st_size))
 
             tree.add(
-                f"{icon} [link file://{path}]{escape(path.name)}\t({size}){description}",
+                f"{icon} [link file://{path.resolve()}]{escape(path.name)}\t({size}){description}",
                 style="white",
                 guide_style="cyan",
             )
@@ -128,7 +128,7 @@ def tree(directory: str = os.getcwd(), skip_hidden: bool = False) -> None:
         directory = Path(directory)
 
     tree = Tree(
-        f":open_file_folder: [link file://{directory}]{directory}",
+        f":open_file_folder: [link file://{directory.resolve()}]{directory}",
         guide_style="cyan"
     )
     walkthrough(directory, tree, skip_hidden)
