@@ -7,7 +7,7 @@ hostname
 
 SCRIPT_DIR=$(readlink -e $(dirname "${BASH_SOURCE[0]}"))
 
-conda activate '/mnt/beegfs/userdata/t_dayris/anaconda/envs/snakemake'
+conda shell.bash activate '/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/snakemake/'
 
 
 python3 "${SCRIPT_DIR}/project_deploy.py" \

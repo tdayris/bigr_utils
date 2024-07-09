@@ -92,7 +92,7 @@ def select_queue(minutes: int) -> str:
 )
 @click.option(
     "--conda_env", type=click.Path(),
-    default="/mnt/beegfs/userdata/t_dayris/anaconda/envs/snakemake",
+    default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/snakemake/",
     help="Path to conda environment",
 )
 @click.option(
