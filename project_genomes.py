@@ -25,6 +25,7 @@ def check_path(path: str) -> None:
 def configure_genomes(
     output: str = f"{os.getcwd()}/config/genomes.csv",
     verbose: bool = False,
+    empry: bool = False,
     force: bool = False,
 ) -> None:
     """Deploy `genomes.csv` file"""
