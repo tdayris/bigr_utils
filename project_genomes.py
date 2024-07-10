@@ -245,7 +245,7 @@ def configure_genomes(
     # Known paths to old human resources
     homo_sapiens_grch37_75: dict[str, str] = {
         # Genome information
-        "species": "mus_musculus",
+        "species": "homo_sapiens",
         "build": "GRCh37",
         "release": "75",
         "origin": "Ensembl",
