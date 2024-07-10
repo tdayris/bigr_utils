@@ -16,6 +16,8 @@ pipelines: tuple[str] = (
     "fair_rnaseq_salmon_quant",
     "fair_bowtie2_mapping",
     "fair_star_mapping",
+    "fair_gatk_mutect2",
+    "fair_macs2_calling",
 )
 
 
