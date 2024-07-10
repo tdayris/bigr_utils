@@ -329,7 +329,7 @@ def configure_genomes(
                 sys.exit(1)
 
     # Save valid paths
-    genomes = DataFrame.from_records([homo_sapiens_grch38_109, mus_musculus_grcm38_99])
+    genomes = DataFrame.from_records([homo_sapiens_grch38_109, mus_musculus_grcm38_99, mus_musculus_grcm39_109, homo_sapiens_grch37_75])
 
     # On user request, remove known files
     if empty is True:
