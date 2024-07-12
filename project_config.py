@@ -51,17 +51,25 @@ def check_path(path: str) -> None:
     default="/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
     help="Path to FastqScreen database configuration file",
 )
+@click.option(
+    "-p",
+    "--params",
+    help="A 'key=value' parameter",
+    multiple=True,
+    default=[""],
+)
 @click.option("-f", "--force", is_flag=True, help="Force over-writing", default=False)
 @click.option(
     "-v", "--verbose", is_flag=True, help="Raise verbosity level", default=False
 )
 @click.help_option("--help", "-h")
 def create_config(
-    samples: str = f"{os.getcwd()}/config/samples.csv",
-    genomes: str = f"{os.getcwd()}/config/genomes.csv",
-    output: str = f"{os.getcwd()}/config/config.yaml",
-    workflow: str = f"{os.getcwd()}/workflow/Snakefile",
-    fastq_screen_config: str = "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
+    samples: Path | str = f"{os.getcwd()}/config/samples.csv",
+    genomes: Path | str = f"{os.getcwd()}/config/genomes.csv",
+    output: Path | str = f"{os.getcwd()}/config/config.yaml",
+    workflow: Path | str = f"{os.getcwd()}/workflow/Snakefile",
+    fastq_screen_config: Path | str = "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
+    params=[""],
     force: bool = False,
     verbose: bool = False,
 ) -> None:
@@ -71,8 +79,8 @@ def create_config(
     if verbose:
         console.print(f"Configuring pipeline...", style="green")
 
-    pipeline: str | None = None
-    tag: str | None = None
+    pipeline: str = "Unknown"
+    tag: str = "Unknown"
 
     # Check file path
     for file_path in (samples, genomes, workflow):
@@ -109,9 +117,19 @@ def create_config(
         },
     }
 
+    for parameter in params:
+        if "=" in parameter:
+            key, value = parameter.split("=")
+            if value.lower() == "true":
+                value = True
+            elif value.lower() == "false":
+                value = False
+            config["params"][key] = value
+
     # Save configuration
     if force or (not Path(output).exists):
         with open(output, "w") as yaml_stream:
+            console.print(config, style="green")
             yaml.dump(config, yaml_stream, default_flow_style=False)
 
     if verbose:
