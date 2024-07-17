@@ -24,7 +24,7 @@ def check_path(path: str) -> None:
 @click.option(
     "-e", "--empty", is_flag=True, default=False, help="Produce an empty genome file"
 )
-@click.option("-c", "--capture_kit", type=click.Path(), default=None)
+@click.option("-c", "--capture_kit", type=click.Path(), default="None")
 @click.help_option("-h", "--help")
 def configure_genomes(
     output: str | Path = f"{os.getcwd()}/config/genomes.csv",
@@ -416,7 +416,7 @@ def configure_genomes(
     if empty is True:
         genomes = genomes[["species", "build", "release"]]
 
-    if capture_kit is not None:
+    if capture_kit is not "None":
         genomes["capture_kit"] = capture_kit
 
     if os.path.exists(output) and (force is False):
