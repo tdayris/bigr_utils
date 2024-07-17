@@ -23,11 +23,13 @@ def check_path(path: str) -> None:
 @click.option(
     "-e", "--empty", is_flag=True, default=False, help="Produce an empty genome file"
 )
+@click.option("-c", "--capture_kit", type=click.Path(), default=None)
 @click.help_option("-h", "--help")
 def configure_genomes(
-    output: str = f"{os.getcwd()}/config/genomes.csv",
+    output: str | Path = f"{os.getcwd()}/config/genomes.csv",
     verbose: bool = False,
     empty: bool = False,
+    capture_kit: str | Path | None = None,
     force: bool = False,
 ) -> None:
     """Deploy `genomes.csv` file"""
@@ -412,6 +414,9 @@ def configure_genomes(
     # On user request, remove known files
     if empty is True:
         genomes = genomes[["species", "build", "release"]]
+
+    if capture_kit is not None:
+        genomes["capture_kit"] = capture_kit
 
     if os.path.exists(output) and (force is False):
         console.print(":warning: A genome file already exists")
