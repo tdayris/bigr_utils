@@ -416,8 +416,8 @@ def configure_genomes(
     if empty is True:
         genomes = genomes[["species", "build", "release"]]
 
-    if capture_kit is not "None":
-        genomes["capture_kit"] = capture_kit
+    if capture_kit != "None":
+        genomes["capture_kit"] = Path(capture_kit).resolve()
 
     if os.path.exists(output) and (force is False):
         console.print(":warning: A genome file already exists")

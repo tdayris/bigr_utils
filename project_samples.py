@@ -95,11 +95,11 @@ def detect_pattern(
     return (None, paths)
 
 
-detect_fastq = partial(detect_pattern, regex="(_|\.)?f(ast)?q(\.gz)?$")
-detet_capture_kit = partial(detect_pattern, regex="(_|\.)bed(\.gz)?")
-detect_index = partial(detect_pattern, regex="_I[\d+](_|\.)")
-detect_R1_strand = partial(detect_pattern, regex="_R?1(_|\.)?")
-detect_R2_strand = partial(detect_pattern, regex="_R?2(_|\.)?")
+detect_fastq = partial(detect_pattern, regex=r"(_|\.)?f(ast)?q(\.gz)?$")
+detet_capture_kit = partial(detect_pattern, regex=r"(_|\.)bed(\.gz)?")
+detect_index = partial(detect_pattern, regex=r"_I[\d+](_|\.)")
+detect_R1_strand = partial(detect_pattern, regex=r"_R?1(_|\.)?")
+detect_R2_strand = partial(detect_pattern, regex=r"_R?2(_|\.)?")
 
 
 def filter_non_fastq_files(
