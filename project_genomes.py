@@ -311,10 +311,18 @@ def configure_genomes(
         "gwascatalog": "",
         "wikipathway": "",
     }
+    
+    genomes_tpl: tuple[dict[str, str]] = (
+        homo_sapiens_grch38_109,
+        mus_musculus_grcm39_109,
+        mus_musculus_grcm38_99,
+        homo_sapiens_grch37_75,
+        homo_sapiens_grch38_105,
+    )
 
 
     # Check each single paths provided
-    for genome in [homo_sapiens_grch38_109, mus_musculus_grcm38_99, mus_musculus_grcm39_109, homo_sapiens_grch37_75]:
+    for genome in genomes_tpl:
         for descriptor, file_path in genome.items():
             if descriptor in ["species", "build", "release", "origin"]:
                 continue  # Skip genome descriptor
@@ -329,7 +337,7 @@ def configure_genomes(
                 sys.exit(1)
 
     # Save valid paths
-    genomes = DataFrame.from_records([homo_sapiens_grch38_109, mus_musculus_grcm38_99, mus_musculus_grcm39_109, homo_sapiens_grch37_75])
+    genomes = DataFrame.from_records(genomes_tpl)
 
     # On user request, remove known files
     if empty is True:
