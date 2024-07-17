@@ -212,3 +212,5 @@ def annotate_paths(paths: list[Path], console: Console, verbose: bool = True) ->
             if verbose:
                 console.log("Could not find any pairs of file(s) with confidence")
             annotation["upstream_file"] = sorted(fastq_read_sequences)
+    else:
+        raise ValueError("No fastq file found in {paths=}")
