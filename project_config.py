@@ -68,7 +68,9 @@ def create_config(
     genomes: Path | str = f"{os.getcwd()}/config/genomes.csv",
     output: Path | str = f"{os.getcwd()}/config/config.yaml",
     workflow: Path | str = f"{os.getcwd()}/workflow/Snakefile",
-    fastq_screen_config: Path | str = "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
+    fastq_screen_config: (
+        Path | str
+    ) = "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
     params=[""],
     force: bool = False,
     verbose: bool = False,

@@ -11,11 +11,13 @@ from functools import partial
 from rich.console import Console
 from pathlib import Path
 
+
 def hhmmss(seconds: int | float) -> str:
     """
     Return humand readable number of seconds
     """
     return str(datetime.timedelta(seconds=int(seconds)))
+
 
 def nb(number: str | int | float) -> str:
     """
@@ -25,7 +27,15 @@ def nb(number: str | int | float) -> str:
         return f"{number:.2f}"
     return round(number, 2)
 
-def extract_text(df: pandas.DataFrame, colname: str, unit: str, val: str = "mean", with_std: bool = True, seconds: bool = False) -> str:
+
+def extract_text(
+    df: pandas.DataFrame,
+    colname: str,
+    unit: str,
+    val: str = "mean",
+    with_std: bool = True,
+    seconds: bool = False,
+) -> str:
     """
     Return the mean and std of a dataframe column as text
     """
@@ -33,12 +43,12 @@ def extract_text(df: pandas.DataFrame, colname: str, unit: str, val: str = "mean
     val = nb(desc.loc[val][colname])
     if (colname == "s") and (not seconds):
         val = hhmmss(val)
-    elif (colname == "runtime"):
+    elif colname == "runtime":
         if seconds is True:
             val = val * 60
         else:
             val = hhmmss(val * 60)
-        
+
     std = ""
     if with_std is True:
         std = nb(desc.loc["std"][colname])
@@ -54,13 +64,18 @@ def extract_text(df: pandas.DataFrame, colname: str, unit: str, val: str = "mean
 
     return f"""{val} {std} {unit}""".strip()
 
+
 mean_time = partial(extract_text, colname="s", unit="")
 reserved_runtime = partial(extract_text, colname="runtime", unit="", with_std=False)
 mean_mib_reserved = partial(extract_text, colname="mem_mib", unit="Mib")
 time_at_most = partial(extract_text, colname="s", unit="", val="max", with_std=False)
-mem_at_most = partial(extract_text, colname="max_vms", unit="Mb", val="max", with_std=False)
+mem_at_most = partial(
+    extract_text, colname="max_vms", unit="Mb", val="max", with_std=False
+)
 mean_mem_used = partial(extract_text, colname="max_vms", unit="Mb")
-max_size = partial(extract_text, colname="size_mb", unit="Mb", val="max", with_std=False)
+max_size = partial(
+    extract_text, colname="size_mb", unit="Mb", val="max", with_std=False
+)
 memory_wasted = partial(extract_text, colname="wasted", unit="Mb")
 efficiency = partial(extract_text, colname="efficiency", unit="%")
 first_quartile = partial(extract_text, unit="", val="25%", with_std=False)
@@ -70,8 +85,9 @@ min_val = partial(extract_text, unit="", val="min", with_std=False)
 max_val = partial(extract_text, unit="", val="max", with_std=False)
 
 
-
-def describe_rule(df: pandas.DataFrame, rule_name: str, verbose: bool, console: Console) -> dict[str, str]:
+def describe_rule(
+    df: pandas.DataFrame, rule_name: str, verbose: bool, console: Console
+) -> dict[str, str]:
     """
     Return text to describe rule requirements and reservation
     """
@@ -84,7 +100,7 @@ def describe_rule(df: pandas.DataFrame, rule_name: str, verbose: bool, console: 
     else:
         tmp = df.copy()
     tmp = tmp.describe()
-    
+
     return {
         "mean_time": mean_time(tmp),
         "mean_reserved_mib": mean_mib_reserved(tmp),
@@ -95,11 +111,17 @@ def describe_rule(df: pandas.DataFrame, rule_name: str, verbose: bool, console: 
         "mean_memory_wasted": memory_wasted(tmp),
         "mean_efficiency": efficiency(tmp),
         "reserved_runtime": reserved_runtime(tmp),
-        "time_efficiency": nb(100 * float(time_at_most(tmp, seconds=True)) / float(reserved_runtime(tmp, seconds=True)))
+        "time_efficiency": nb(
+            100
+            * float(time_at_most(tmp, seconds=True))
+            / float(reserved_runtime(tmp, seconds=True))
+        ),
     }
 
 
-def save_as_markdown(description: dict[str, str], output: str | Path, verbose: bool, console: Console) -> None:
+def save_as_markdown(
+    description: dict[str, str], output: str | Path, verbose: bool, console: Console
+) -> None:
     """
     Save the dictionary as a Markdown file
     """
@@ -117,8 +139,7 @@ def save_as_markdown(description: dict[str, str], output: str | Path, verbose: b
                 f"on Gustave Roussy's HPC Flamingo, on a {summary['max_input_size']} dataset.",
                 "",
                 "## Time",
-                ""
-                f"A job took {summary['longest_required_time']} to proceed,",
+                "" f"A job took {summary['longest_required_time']} to proceed,",
                 f"on average {summary['mean_time']}",
                 "",
                 "## Efficiency",
@@ -136,7 +157,8 @@ def save_as_markdown(description: dict[str, str], output: str | Path, verbose: b
                 global_content += rule_content
 
         markdown_stream.write("\n".join(global_content))
-    
+
+
 def search_benchmarks(dir_path: str | Path, verbose: bool, console: Console):
     """
     Search and return paths to all benchmark files
@@ -148,14 +170,21 @@ def search_benchmarks(dir_path: str | Path, verbose: bool, console: Console):
     for path in dir_path.iterdir():
         if path.is_dir():
             if verbose is True:
-                console.print(f"Looking for benchmark files in {dir_path}...", style="green")
+                console.print(
+                    f"Looking for benchmark files in {dir_path}...", style="green"
+                )
 
-            yield from search_benchmarks(dir_path=path, verbose=verbose, console=console)
+            yield from search_benchmarks(
+                dir_path=path, verbose=verbose, console=console
+            )
 
         if path.name.endswith(".tsv"):
             yield path
 
-def concat_frames(paths: list[Path], verbose: bool, console: Console) -> pandas.DataFrame:
+
+def concat_frames(
+    paths: list[Path], verbose: bool, console: Console
+) -> pandas.DataFrame:
     """
     Append multiple dataframes row by row
     """
@@ -178,7 +207,10 @@ def concat_frames(paths: list[Path], verbose: bool, console: Console) -> pandas.
 
     return df.reset_index()
 
-def preprocess(df: pandas.DataFrame, verbose: bool, console: Console) -> pandas.DataFrame:
+
+def preprocess(
+    df: pandas.DataFrame, verbose: bool, console: Console
+) -> pandas.DataFrame:
     """
     Explode required columns, compute intermediar values
     and create index
@@ -186,19 +218,41 @@ def preprocess(df: pandas.DataFrame, verbose: bool, console: Console) -> pandas.
     if verbose is True:
         console.print("Expanding information from the benchmarks...", style="green")
     df["rule_jobname"] = [f"{j}.{r}" for j, r in zip(df.jobid, df.rule_name)]
-    
+
     # Explode resources
-    resources = pandas.DataFrame([json.loads(data.replace("'", "\"")) if not isinstance(data, float) else {} for data in pandas.Series(df.resources.explode())])
+    resources = pandas.DataFrame(
+        [
+            json.loads(data.replace("'", '"')) if not isinstance(data, float) else {}
+            for data in pandas.Series(df.resources.explode())
+        ]
+    )
     df = pandas.concat([df.copy(), resources.reset_index()], axis=1)
-    
+
     # Explode size
     if verbose is True:
         console.print("Adding new information in the table...", style="green")
-    df["size_mb"] = [sum([i for i in json.loads((data.replace("'", "\"").values() if not isinstance(data, float | str) else "{}")) if i is not pandas.NA]) for data in pandas.Series(df.input_size_mb.explode())]
-    
+    df["size_mb"] = [
+        sum(
+            [
+                i
+                for i in json.loads(
+                    (
+                        data.replace("'", '"').values()
+                        if not isinstance(data, float | str)
+                        else "{}"
+                    )
+                )
+                if i is not pandas.NA
+            ]
+        )
+        for data in pandas.Series(df.input_size_mb.explode())
+    ]
+
     # Efficiency
-    df["efficiency"] = [(100 * vss) / mb if mb > 0 else 100 for vss, mb in zip(df.max_vms, df.mem_mb)]
-    df["wasted"] = [mb - vss if mb > 0 else 0 for  vss, mb in zip(df.max_vms, df.mem_mb)]
+    df["efficiency"] = [
+        (100 * vss) / mb if mb > 0 else 100 for vss, mb in zip(df.max_vms, df.mem_mb)
+    ]
+    df["wasted"] = [mb - vss if mb > 0 else 0 for vss, mb in zip(df.max_vms, df.mem_mb)]
     return df
 
 
@@ -208,14 +262,14 @@ def preprocess(df: pandas.DataFrame, verbose: bool, console: Console) -> pandas.
     "--benchmark",
     help="Path to benchmark directory",
     default=f"{os.getcwd()}/benchmark",
-    type=click.Path()
+    type=click.Path(),
 )
 @click.option(
     "-o",
     "--output",
     help="Path to output file",
     default=f"{os.getcwd()}/resources.md",
-    type=click.Path()
+    type=click.Path(),
 )
 @click.option(
     "-t",
@@ -260,17 +314,16 @@ def main(
     # Building report summary
     console.print("Summerizing reports...", style="green")
     description = {"General Pipeline": describe_rule(df, "all", verbose, console)}
-    description.update(**{
-        rule: describe_rule(df, rule, verbose, console)
-        for rule in rules
-    })
+    description.update(
+        **{rule: describe_rule(df, rule, verbose, console) for rule in rules}
+    )
 
     # Saving results
     console.print("Saving results...", style="green")
     df = pandas.DataFrame(description).T
     df.to_csv(table, sep=",", header=True, index=True)
     save_as_markdown(description, output, verbose, console)
-    
+
 
 if __name__ == "__main__":
     main()

@@ -89,5 +89,6 @@ def deploy_pipeline(
     if verbose:
         console.print(":ballot_box_with_check: Pipeline deployed", style="green")
 
+
 if __name__ == "__main__":
     deploy_pipeline()

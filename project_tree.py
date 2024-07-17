@@ -87,7 +87,19 @@ def walkthrough(directory: Path, tree: Tree, skip_hidden: bool = False) -> None:
             elif path.suffix == ".html":
                 icon = ":globe_showing_europe-africa:"
                 description += "HTML report"
-            elif path.name.endswith((".bcf", ".vcf", ".vcf.gz", ".gvcf", ".gvcf.gz", ".maf", ".vcf.gz.tbi", ".vcf.gz.csi", ".ubcf")):
+            elif path.name.endswith(
+                (
+                    ".bcf",
+                    ".vcf",
+                    ".vcf.gz",
+                    ".gvcf",
+                    ".gvcf.gz",
+                    ".maf",
+                    ".vcf.gz.tbi",
+                    ".vcf.gz.csi",
+                    ".ubcf",
+                )
+            ):
                 icon = ":dna:"
                 description += "Variants description"
             elif path.suffix == ".bin":
@@ -129,10 +141,11 @@ def tree(directory: str = os.getcwd(), skip_hidden: bool = False) -> None:
 
     tree = Tree(
         f":open_file_folder: [link file://{directory.resolve()}]{directory}",
-        guide_style="cyan"
+        guide_style="cyan",
     )
     walkthrough(directory, tree, skip_hidden)
     print(tree)
+
 
 if __name__ == "__main__":
     tree()

@@ -76,22 +76,27 @@ def select_queue(minutes: int) -> str:
     help="Path to launcher script",
 )
 @click.option(
-    "-p", "--profile", type=click.Path(),
+    "-p",
+    "--profile",
+    type=click.Path(),
     default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/profiles/slurm-web-8/",
     help="Path to Snakemake profile",
 )
 @click.option(
-    "--snakemake_cache", type=click.Path(),
+    "--snakemake_cache",
+    type=click.Path(),
     default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/snakemake_cache",
     help="Path to snakemake cache dir to avoid index over-writing",
 )
 @click.option(
-    "--conda_cache", type=click.Path(),
+    "--conda_cache",
+    type=click.Path(),
     default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache",
     help="Path to conda cache dir to avoid repetitive package downloads",
 )
 @click.option(
-    "--conda_env", type=click.Path(),
+    "--conda_env",
+    type=click.Path(),
     default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/snakemake/",
     help="Path to conda environment",
 )
@@ -114,10 +119,18 @@ def sbatch_creator(
     workdir: str | Path = os.getcwd(),
     config: str | Path = f"{os.getcwd()}/config/config.yaml",
     output: str | Path = f"{os.getcwd()}/scripts/sbatch.sh",
-    profile: str | Path = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/profiles/slurm-web-8/",
-    snakemake_cache: str | Path = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/snakemake_cache",
-    conda_cache: str | Path = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache",
-    conda_env: str | Path = "/mnt/beegfs/userdata/t_dayris/anaconda/envs/snakemake_v8.11.6",
+    profile: (
+        str | Path
+    ) = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/profiles/slurm-web-8/",
+    snakemake_cache: (
+        str | Path
+    ) = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/snakemake_cache",
+    conda_cache: (
+        str | Path
+    ) = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache",
+    conda_env: (
+        str | Path
+    ) = "/mnt/beegfs/userdata/t_dayris/anaconda/envs/snakemake_v8.11.6",
     force: bool = False,
     verbose: bool = False,
     mem: str = "1G",

@@ -20,7 +20,9 @@ def check_path(path: str) -> None:
 )
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Increase verbosity")
 @click.option("-f", "--force", is_flag=True, default=False, help="Force over-writing")
-@click.option("-e", "--empty", is_flag=True, default=False, help="Produce an empty genome file")
+@click.option(
+    "-e", "--empty", is_flag=True, default=False, help="Produce an empty genome file"
+)
 @click.help_option("-h", "--help")
 def configure_genomes(
     output: str = f"{os.getcwd()}/config/genomes.csv",
@@ -171,7 +173,7 @@ def configure_genomes(
         "gwascatalog": "",
         "wikipathway": "",
     }
-    
+
     # Known paths to mouse recent resources
     mus_musculus_grcm39_109: dict[str, str] = {
         # Genome information
@@ -190,7 +192,7 @@ def configure_genomes(
         # Transcript sequences
         "transcripts_fasta": "",
         "transcripts_fai": "",
-        "transcripts_dict": "", 
+        "transcripts_dict": "",
         # Known variants
         "af_only": "",
         "af_only_tbi": "",
@@ -241,13 +243,82 @@ def configure_genomes(
         "gwascatalog": "",
         "wikipathway": "",
     }
-    
+
     # Known paths to old human resources
     homo_sapiens_grch37_75: dict[str, str] = {
         # Genome information
         "species": "homo_sapiens",
         "build": "GRCh37",
         "release": "75",
+        "origin": "Ensembl",
+        # DNA sequences
+        "dna_fasta": "",
+        "dna_fai": "",
+        "dna_dict": "",
+        # cDNA sequences
+        "cdna_fasta": "",
+        "cdna_fai": "",
+        "cdna_dict": "",
+        # Transcript sequences
+        "transcripts_fasta": "",
+        "transcripts_fai": "",
+        "transcripts_dict": "",
+        # Known variants
+        "af_only": "",
+        "af_only_tbi": "",
+        "dbsnp": "",
+        "dbsnp_tbi": "",
+        # Gene annotations
+        "gtf": "",
+        "gff3": "",
+        # Reformatting
+        "id_to_gene": "",
+        "t2g": "",
+        "genepred": "",
+        "genepred_bed": "",
+        # Known blacklists
+        "blacklist": "",
+        # Bowtie2 indexes
+        "bowtie2_dna_index": "",
+        "bowtie2_transcripts_index": "",
+        "bowtie2_cdna_index": "",
+        # Salmon index
+        "salmon_index": "",
+        # Variant databases
+        "CancerGeneCensus": "",
+        "clinvar": "",
+        "clinvar_tbi": "",
+        "cosmic": "",
+        "cosmic_tbi": "",
+        "dbnsfp": "",
+        "dbnsfp_tbi": "",
+        "dbvar": "",
+        "dbvar_tbi": "",
+        "exac": "",
+        "exac_tbi": "",
+        "kaviar": "",
+        "kaviar_tbi": "",
+        "oncokb": "",
+        # Pathways and genes sets
+        "CORUM": "",
+        "msigdb_c1": "",
+        "msigdb_c2": "",
+        "msigdb_c3": "",
+        "msigdb_c4": "",
+        "msigdb_c5": "",
+        "msigdb_c6": "",
+        "msigdb_c7": "",
+        "msigdb_c8": "",
+        "msigdb_h": "",
+        "gwascatalog": "",
+        "wikipathway": "",
+    }
+
+    homo_sapiens_grch38_105: dict[str, str] = {
+        # Genome information
+        "species": "homo_sapiens",
+        "build": "GRCh38",
+        "release": "105",
         "origin": "Ensembl",
         # DNA sequences
         "dna_fasta": "",
@@ -311,7 +382,7 @@ def configure_genomes(
         "gwascatalog": "",
         "wikipathway": "",
     }
-    
+
     genomes_tpl: tuple[dict[str, str]] = (
         homo_sapiens_grch38_109,
         mus_musculus_grcm39_109,
@@ -319,7 +390,6 @@ def configure_genomes(
         homo_sapiens_grch37_75,
         homo_sapiens_grch38_105,
     )
-
 
     # Check each single paths provided
     for genome in genomes_tpl:

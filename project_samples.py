@@ -9,10 +9,12 @@ from more_itertools import chunked_even
 from rich.console import Console
 
 
-def filter_regex(regex: str, paths: list[Path], console: Console, verbose: bool = True) -> tuple[list[Path]]:
+def filter_regex(
+    regex: str, paths: list[Path], console: Console, verbose: bool = True
+) -> tuple[list[Path]]:
     """
     Filter-out samples answering a given regex
-    
+
     Parameters:
     regex   str       : Regular expression used to filter the list of files
     paths   list[Path]: List of files to filter
@@ -26,7 +28,7 @@ def filter_regex(regex: str, paths: list[Path], console: Console, verbose: bool 
     regex = re.compile(regex)
     kept: list[str] = [path for path in paths if regex.match(path.resolve())]
     not_kept: list[str] = [path for path in paths if not regex.match(path.resolve())]
-    
+
     if verbose:
         console.print(
             f"Out of {len(paths)} paths, "
@@ -37,7 +39,9 @@ def filter_regex(regex: str, paths: list[Path], console: Console, verbose: bool 
     return (kept, not_kept)
 
 
-def flag_identical_names(paths: list[Path], console: Console, verbose: bool = True) -> dict[str, list[Path]]:
+def flag_identical_names(
+    paths: list[Path], console: Console, verbose: bool = True
+) -> dict[str, list[Path]]:
     """
     Find samples with identical file name and different file paths
 
@@ -52,13 +56,9 @@ def flag_identical_names(paths: list[Path], console: Console, verbose: bool = Tr
         result[path.name].append(path)
 
     result["duplicated"] = [
-        sample for sample, paths in result.items() 
-        if len(paths) > 1
+        sample for sample, paths in result.items() if len(paths) > 1
     ]
-    result["unique"] = [
-        sample for sample, paths in result.item() 
-        if len(paths) == 1
-    ]
+    result["unique"] = [sample for sample, paths in result.item() if len(paths) == 1]
 
     if verbose:
         console.print(
@@ -70,7 +70,10 @@ def flag_identical_names(paths: list[Path], console: Console, verbose: bool = Tr
 
     return result
 
-def detect_pattern(paths: list[Path], regex: str, console: Console, verbose: bool = True) -> tuple[list[Path] | None]:
+
+def detect_pattern(
+    paths: list[Path], regex: str, console: Console, verbose: bool = True
+) -> tuple[list[Path] | None]:
     """
     Search for pattern in all sample names.
 
@@ -78,15 +81,19 @@ def detect_pattern(paths: list[Path], regex: str, console: Console, verbose: boo
     paths   list[Path]: List of files to check
     regex   str       : Regular expression to search
 
-    Return: 
+    Return:
     True if:
     1. regex exists
     2. regex exists for all or one out of two samples
     """
     answering, not_answering = filter_regex(paths, regex, verbose)
     if len(answering) > 0:
-        return (answering, not_answering, )
+        return (
+            answering,
+            not_answering,
+        )
     return (None, paths)
+
 
 detect_fastq = partial(detect_pattern, regex="(_|\.)?f(ast)?q(\.gz)?$")
 detet_capture_kit = partial(detect_pattern, regex="(_|\.)bed(\.gz)?")
@@ -94,7 +101,13 @@ detect_index = partial(detect_pattern, regex="_I[\d+](_|\.)")
 detect_R1_strand = partial(detect_pattern, regex="_R?1(_|\.)?")
 detect_R2_strand = partial(detect_pattern, regex="_R?2(_|\.)?")
 
-def filter_non_fastq_files(paths: list[Path], annotation: dict[str, list[str]], console: Console, verbose: bool = True) -> tuple[list[str], dict[str, list[str]]]:
+
+def filter_non_fastq_files(
+    paths: list[Path],
+    annotation: dict[str, list[str]],
+    console: Console,
+    verbose: bool = True,
+) -> tuple[list[str], dict[str, list[str]]]:
     """
     Annotate and remove non-fastq files from the list of paths
 
@@ -110,10 +123,12 @@ def filter_non_fastq_files(paths: list[Path], annotation: dict[str, list[str]], 
     if isinstance(other_files, list) and len(other_files) >= 1:
         # Deal with capture-kit file
         bed_files, other_files = detet_capture_kit(other_files)
-        
+
         if bed_files is None:
             if verbose:
-                console.print("There were no bed files (flagged as suspected capture kit file)")
+                console.print(
+                    "There were no bed files (flagged as suspected capture kit file)"
+                )
 
         elif isinstance(bed_files, list) and len(bed_files) == 1:
             if verbose:
@@ -123,7 +138,7 @@ def filter_non_fastq_files(paths: list[Path], annotation: dict[str, list[str]], 
 
         else:
             annotation["non_fastq_files"] = list(sorted(bed_files))
-        
+
         # Keep track of remaining files (xml, txt, ...)
         if isinstance(other_files, list) and len(other_files) >= 1:
             annotation["non_fastq_files"] += list(sorted(other_files))
@@ -131,7 +146,12 @@ def filter_non_fastq_files(paths: list[Path], annotation: dict[str, list[str]], 
     return fastq_files, annotation
 
 
-def filter_index_fastq_files(paths: list[Path], annotation: dict[str, list[str]], console: Console, verbose: bool = True) -> tuple[list[str], dict[str, list[str]]]:
+def filter_index_fastq_files(
+    paths: list[Path],
+    annotation: dict[str, list[str]],
+    console: Console,
+    verbose: bool = True,
+) -> tuple[list[str], dict[str, list[str]]]:
     """
     Annotate and remove fastq index files from the list of paths
 
@@ -148,18 +168,22 @@ def filter_index_fastq_files(paths: list[Path], annotation: dict[str, list[str]]
         # Keep track of index sequences
         if len(fastq_index_sequences) == len(fastq_read_sequences):
             if verbose:
-                console.print("It seems there are as much index files as read files, library seems single-ended.")
-            
+                console.print(
+                    "It seems there are as much index files as read files, library seems single-ended."
+                )
+
             # Library is single-ended
             annotation["upstream_file"] = list(sorted(fastq_read_sequences))
             annotation["index"] = list(sorted(fastq_index_sequences))
 
             return (None, annotation)
-        
+
         elif len(fastq_index_sequences) == (len(fastq_read_sequences) / 2):
             if verbose:
-                console.print("It seems there are half index files as read files, library seems pair-ended.")
-            
+                console.print(
+                    "It seems there are half index files as read files, library seems pair-ended."
+                )
+
             # Library is pair-ended
             annotation["index"] = list(sorted(fastq_index_sequences))
             fastq_read_sequences = chunked_even(sorted(fastq_read_sequences), 2)
@@ -174,13 +198,15 @@ def filter_index_fastq_files(paths: list[Path], annotation: dict[str, list[str]]
             fastq_read_sequences = sorted(fastq_read_sequences + fastq_index_sequences)
 
             return (fastq_read_sequences, annotation)
-    
+
     if verbose:
         console.print("No index identified")
     return (paths, annotation)
 
 
-def annotate_paths(paths: list[Path], console: Console, verbose: bool = True) -> dict[str, dict[str, list[str]]]:
+def annotate_paths(
+    paths: list[Path], console: Console, verbose: bool = True
+) -> dict[str, dict[str, list[str]]]:
     """
     From a given list of paths, identify pairs, indexes, resequencings and
     sample names.
@@ -194,9 +220,11 @@ def annotate_paths(paths: list[Path], console: Console, verbose: bool = True) ->
     fastq_files, annotation = filter_non_fastq_files(paths, annotation.copy())
 
     # Deal with index/primer files
-    fastq_read_sequences, annotation = filter_index_fastq_files(fastq_files, annotation.copy())
+    fastq_read_sequences, annotation = filter_index_fastq_files(
+        fastq_files, annotation.copy()
+    )
 
-    if fastq_read_sequences: 
+    if fastq_read_sequences:
         # Search pairs of files
         upstream_fastq, other_fastq = detect_R1_strand(fastq_read_sequences)
         downstream_fastq, other_fastq = detect_R2_strand(other_fastq)
