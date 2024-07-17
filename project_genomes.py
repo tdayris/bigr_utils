@@ -6,6 +6,7 @@ import sys
 
 from pandas import DataFrame
 from rich.console import Console
+from pathlib import Path
 
 
 def check_path(path: str) -> None:
