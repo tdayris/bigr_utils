@@ -138,7 +138,8 @@ def configure_genomes(
         # Reformatting
         "id_to_gene": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.99/mus_musculus.GRCm38.99.id_to_gene.tsv",
         "t2g": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.99/mus_musculus.GRCm38.99.t2g.tsv",
-        "genepred": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.99/mus_musculus.GRCm38.99.genePred",
+        "genepred": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/mus_musculus.GRCm39.109/mus_musculus.GRCm39.109.genePred",
+        "genepred_bed": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/mus_musculus.GRCm39.109/mus_musculus.GRCm39.109.genePred.bed",
         # Known blacklists
         "blacklist": "",
         # Bowtie2 indexes
@@ -202,13 +203,13 @@ def configure_genomes(
         "dbsnp": "",
         "dbsnp_tbi": "",
         # Gene annotations
-        "gtf": "",
-        "gff3": "",
+        "gtf": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.109/mus_musculus.GRCm39.109.gtf",
+        "gff3": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.109/mus_musculus.GRCm39.109.gff3",
         # Reformatting
-        "id_to_gene": "",
-        "t2g": "",
-        "genepred": "",
-        "genepred_bed": "",
+        "id_to_gene": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.109/mus_musculus.GRCm39.109.id_to_gene.tsv",
+        "t2g": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCm38.109/mus_musculus.GRCm39.109.t2g.tsv",
+        "genepred": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/mus_musculus.GRCm39.109/mus_musculus.GRCm39.109.genePred",
+        "genepred_bed": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/mus_musculus.GRCm39.109/mus_musculus.GRCm39.109.genePred.bed",
         # Known blacklists
         "blacklist": "",
         # Bowtie2 indexes
@@ -272,13 +273,13 @@ def configure_genomes(
         "dbsnp": "",
         "dbsnp_tbi": "",
         # Gene annotations
-        "gtf": "",
+        "gtf": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh37.75/homo_sapiens.GRCh37.75.gtf",
         "gff3": "",
         # Reformatting
-        "id_to_gene": "",
-        "t2g": "",
-        "genepred": "",
-        "genepred_bed": "",
+        "id_to_gene": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh37.75/homo_sapiens.GRCh37.75.id_to_gene.tsv",
+        "t2g": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh37.75/homo_sapiens.GRCh37.75.t2g.tsv",
+        "genepred": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/homo_sapiens.GRCh37.75/homo_sapiens.GRCh37.75.genePred",
+        "genepred_bed": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/homo_sapiens.GRCh37.75/homo_sapiens.GRCh37.75.genePred.bed",
         # Known blacklists
         "blacklist": "",
         # Bowtie2 indexes
@@ -341,13 +342,13 @@ def configure_genomes(
         "dbsnp": "",
         "dbsnp_tbi": "",
         # Gene annotations
-        "gtf": "",
-        "gff3": "",
+        "gtf": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh38.105/homo_sapiens.GRCh38.105.gtf",
+        "gff3": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh38.105/homo_sapiens.GRCh38.105.gff3",
         # Reformatting
-        "id_to_gene": "",
-        "t2g": "",
-        "genepred": "",
-        "genepred_bed": "",
+        "id_to_gene": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh38.105/homo_sapiens.GRCh38.105.id_to_gene.tsv",
+        "t2g": "/mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh38.105/homo_sapiens.GRCh38.105.t2g.tsv",
+        "genepred": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/homo_sapiens.GRCh38.105/homo_sapiens.GRCh38.105.genePred",
+        "genepred_bed": "/mnt/beegfs/database/bioinfo/Index_DB/genePred/homo_sapiens.GRCh38.105/homo_sapiens.GRCh38.105.genePred.bed",
         # Known blacklists
         "blacklist": "",
         # Bowtie2 indexes
