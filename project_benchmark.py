@@ -114,7 +114,7 @@ def describe_rule(
         "time_efficiency": nb(
             100
             * float(time_at_most(tmp, seconds=True))
-            / float(reserved_runtime(tmp, seconds=True))
+            / max(float(reserved_runtime(tmp, seconds=True)), 1)
         ),
     }
 

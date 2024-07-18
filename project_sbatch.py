@@ -210,7 +210,7 @@ def sbatch_creator(
         f"#SBATCH --comment='Snakemake launcher for {job_name.replace('_', ' ')}'",
         "",
         "# Ensure bash works properly or stops",
-        "set -euiop 'pipefail'",
+        "set -eiop 'pipefail'",
         "shopt -s nullglob",
         "",
         f"BIGR_DEFAULT_TMP='{tmp_dir}'",
