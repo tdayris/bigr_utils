@@ -101,6 +101,18 @@ def select_queue(minutes: int) -> str:
     help="Path to conda environment",
 )
 @click.option(
+    "--conda_prefix",
+    type=click.Path(),
+    default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/",
+    help="Path to conda install directory",
+)
+@click.option(
+    "--apptainer_prefix",
+    type=click.Path(),
+    default="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/",
+    help="Path to apptainer/podman/singularity/docker image direactory",
+)
+@click.option(
     "-f", "--force", is_flag=True, default=False, help="Force script over-writing."
 )
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Increase verbosity")
@@ -131,6 +143,12 @@ def sbatch_creator(
     conda_env: (
         str | Path
     ) = "/mnt/beegfs/userdata/t_dayris/anaconda/envs/snakemake_v8.11.6",
+    apptainer_prefix: (
+        str | Path
+    ) = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/",
+    conda_prefix: (
+        str | Path
+    ) = "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/",
     force: bool = False,
     verbose: bool = False,
     mem: str = "1G",
@@ -278,7 +296,26 @@ def sbatch_creator(
         f"conda activate '{conda_env}'",
         "",
         "# Run pipeline",
-        f"snakemake --profile '{profile}'",
+        f"snakemake \\",
+        "  --cores 30 \\",
+        "  --jobs 50 \\",
+        "  --local-cores 2 \\",
+        "  --keep-going \\",
+        "  --rerun-triggers 'mtime' \\",
+        "  --executor slurm-gustave-roussy \\",
+        "  --benchmark-extended \\",
+        "  --rerun-incomplete \\",
+        "  --printshellcmds \\",
+        "  --restart-times 3 \\",
+        "  --show-failed-logs \\",
+        "  --jobname '{name}.{jobid}.slurm.snakejob.sh' \\",
+        "  --software-deployment-method 'apptainer' 'conda' \\",
+        f"  --conda-prefix '{conda_prefix}' \\",
+        f"  --apptainer-prefix '{apptainer_prefix}' \\",
+        "  --max-jobs-per-second 1 \\",
+        "  --max-status-checks-per-second 1 \\",
+        f"  --shadow-prefix '{tmp_dir}'",
+        "",
     )
 
     # Save sbatch script
