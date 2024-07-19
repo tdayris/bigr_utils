@@ -4,7 +4,6 @@ set -euiop 'pipefail'
 shopt -s nullglob
 
 SCRIPT_DIR=$(readlink -e $(dirname "${BASH_SOURCE[0]}"))
-BASE_DIR=$(readlink -e "${SCRIPT_DIR}/..")
 PIPELINE_NAME="fair_gatk_mutect2"
 TAG="1.5.3"
 
