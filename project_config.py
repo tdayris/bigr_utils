@@ -45,7 +45,7 @@ def check_path(path: str) -> None:
     help="Path to the snakefile",
 )
 @click.option(
-    "-f",
+    "-s",
     "--fastq_screen_config",
     type=click.Path(),
     default="/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/fastq_screen.conf",
