@@ -106,6 +106,8 @@ def configure_genomes(
         "msigdb_h": "/mnt/beegfs/database/bioinfo/Index_DB/MSigDB/homo_sapiens/v2023.1/entrez/h.all.v2023.1.Hs.entrez.gmt",
         "gwascatalog": "/mnt/beegfs/database/bioinfo/Index_DB/GWASCatalog/gwas_catalog_v1.0.2-studies_r2020-05-03.tsv",
         "wikipathway": "/mnt/beegfs/database/bioinfo/Index_DB/WikiPathway/HomoSapiens/hsapiens.WP.ENSG.gmt",
+        # SnpEff
+        "snpeff_db": "/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/5.1/GRCh38.99/",
     }
 
     # Known paths to mouse resources
@@ -176,6 +178,8 @@ def configure_genomes(
         "msigdb_h": "",
         "gwascatalog": "",
         "wikipathway": "",
+        # SnpEff
+        "snpeff_db": "/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/5.1/GRCm38.99/",
     }
 
     # Known paths to mouse recent resources
@@ -246,6 +250,8 @@ def configure_genomes(
         "msigdb_h": "",
         "gwascatalog": "",
         "wikipathway": "",
+        # SnpEff
+        "snpeff_db": "",
     }
 
     # Known paths to old human resources
@@ -316,6 +322,8 @@ def configure_genomes(
         "msigdb_h": "/mnt/beegfs/database/bioinfo/Index_DB/MSigDB/homo_sapiens/v2023.1/entrez/h.all.v2023.1.Hs.entrez.gmt",
         "gwascatalog": "/mnt/beegfs/database/bioinfo/Index_DB/GWASCatalog/gwas_catalog_v1.0.2-studies_r2020-05-03.tsv",
         "wikipathway": "/mnt/beegfs/database/bioinfo/Index_DB/WikiPathway/HomoSapiens/hsapiens.WP.ENSG.gmt",
+        # SnpEff
+        "snpeff_db": "/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/GRCh37.75",
     }
 
     homo_sapiens_grch38_105: dict[str, str] = {
@@ -385,6 +393,8 @@ def configure_genomes(
         "msigdb_h": "/mnt/beegfs/database/bioinfo/Index_DB/MSigDB/homo_sapiens/v2023.1/entrez/h.all.v2023.1.Hs.entrez.gmt",
         "gwascatalog": "/mnt/beegfs/database/bioinfo/Index_DB/GWASCatalog/gwas_catalog_v1.0.2-studies_r2020-05-03.tsv",
         "wikipathway": "/mnt/beegfs/database/bioinfo/Index_DB/WikiPathway/HomoSapiens/hsapiens.WP.ENSG.gmt",
+        # SnpEff
+        "snpeff_db": "/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/5.1/GRCh38.99",
     }
 
     genomes_tpl: tuple[dict[str, str]] = (

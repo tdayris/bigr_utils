@@ -309,7 +309,7 @@ def sbatch_creator(
         "  --restart-times 3 \\",
         "  --show-failed-logs \\",
         "  --jobname '{name}.{jobid}.slurm.snakejob.sh' \\",
-        "  --software-deployment-method 'apptainer' 'conda' \\",
+        "  --software-deployment-method 'conda' \\",
         f"  --conda-prefix '{conda_prefix}' \\",
         f"  --apptainer-prefix '{apptainer_prefix}' \\",
         "  --max-jobs-per-second 1 \\",
