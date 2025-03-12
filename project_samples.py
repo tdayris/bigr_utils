@@ -393,6 +393,42 @@ def search_files_locally(
         yield content
 
 
+def search_files_on_iRODS(
+        project_id: str | list[str], verbose: bool, console: Console
+    ) -> Generator[Path, None, None]:
+    """
+    Yeld all available files on iRODS under the given project ID
+    """
+    ssl_settings = {}
+    env_file: str = Path('~/.irods/irods_environment.json').expanduser()
+    if not Path(env_file).exists():
+        raise FileNotFoundError(
+            f"Could not find {env_file=}. "
+            "Use `iinit` in your terminal."
+        )
+
+    if isinstance(project_id, str):
+        project_id = [project_id]
+
+    if verbose:
+        console.log(f"Searching for {project_id=} on iRODS")
+
+    for project in project_id:
+        with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
+            # iRODS query, this takes several seconds
+            collections: session.query = (
+                session.query(Collection, CollectionMeta)
+                       .filter(Criterion("=", CollectionMeta.name, "projectName"))
+                       .filter(Criterion("=", CollectionMeta.value, project))
+            )
+
+            # Parse query, this takes 2 seconds
+            for collection in collections:
+                for sub_coll in session.collections.get(collection[Collection.name]).subcollections:
+                    for dataset in sub_coll.data_objects:
+                        yield Path(dataset.path)
+
+
 @click.command(context_settings={"show_default": True})
 @click.option(
     "-d",
@@ -467,7 +503,7 @@ def main(
     if irods == "None":
         file_list = sorted(search_files_locally(directory, verbose, console))
     else:
-        raise NotImplementedError("Sorry...")
+        file_list = sorted(search_files_on_iRODS(directory, verbose, console))
 
     try:
         annotated: dict[str, str] = annotate_paths(
