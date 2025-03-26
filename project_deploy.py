@@ -58,7 +58,7 @@ def deploy_pipeline(
     # https://github.com/gitpython-developers/GitPython/issues/1071
     if tag == "latest":
         g = git.cmd.Git()
-        blob: str = g.ls_remote(git_address, tags=True)
+        blob: str = g.ls_remote(git_address, sort='-v:refname', tags=True)
         tag = blob.split("\n")[0].split("/")[-1]
         if verbose:
             console.print(f"Pipeline version is: {tag}", style="green")

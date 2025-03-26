@@ -6,6 +6,11 @@ import os
 import sys
 import pandas
 
+import irods
+from irods.column import Criterion, In
+from irods.models import Collection, CollectionMeta
+from irods.session import iRODSSession
+
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
@@ -37,15 +42,16 @@ def filter_regex(
     ]
 
     if verbose:
-        console.print(
+        console.log(
             f"Out of {len(paths)} paths, "
             f"{len(kept)} answered {regex.pattern}, "
-            f"{len(not_kept)} did not.",
+            f"{len(not_kept)} did not. "
+            f"{kept=}, {not_kept=}.",
             style="green",
         )
 
         if len(kept) == 0:
-            console.print(f":warning: No files kept!", style="dark_orange")
+            console.log(f":warning: No files kept!", style="dark_orange")
 
     return (kept, not_kept)
 
@@ -72,7 +78,7 @@ def flag_identical_names(
     result["unique"] = [sample for sample, paths in result.item() if len(paths) == 1]
 
     if verbose:
-        console.print(
+        console.log(
             "Based on the file names uniquely, "
             f"among {len(paths)} samples, "
             f"{len(result['duplicated'])} were flagged as duplicates or sequenced over multiple runs, "
@@ -144,14 +150,14 @@ def filter_non_fastq_files(
 
         if bed_files is None:
             if verbose:
-                console.print(
+                console.log(
                     "There were no bed files (flagged as suspected capture kit file)",
                     style="green",
                 )
 
         elif isinstance(bed_files, list) and len(bed_files) == 1:
             if verbose:
-                console.print(
+                console.log(
                     "File flagged as suspected capture kit: {bed_files=}", style="green"
                 )
             annotation["capture_kit_bed"] = bed_files
@@ -192,8 +198,9 @@ def filter_index_fastq_files(
         # Keep track of index sequences
         if len(fastq_index_sequences) == len(fastq_read_sequences):
             if verbose:
-                console.print(
-                    "It seems there are as much index files as read files, library seems single-ended."
+                console.log(
+                    "It seems there are as much index files as read files, library seems single-ended.",
+                    style="green",
                 )
 
             # Library is single-ended
@@ -204,7 +211,7 @@ def filter_index_fastq_files(
 
         elif len(fastq_index_sequences) == (len(fastq_read_sequences) / 2):
             if verbose:
-                console.print(
+                console.log(
                     "It seems there are half index files as read files, library seems pair-ended.",
                     style="green",
                 )
@@ -219,7 +226,7 @@ def filter_index_fastq_files(
 
         else:
             if verbose:
-                console.print(
+                console.log(
                     "Could not link index files and the rest of fastq files",
                     style="green",
                 )
@@ -228,7 +235,7 @@ def filter_index_fastq_files(
             return (fastq_read_sequences, annotation)
 
     if verbose:
-        console.print("No index identified", style="green")
+        console.log("No index identified", style="green")
     return (paths, annotation)
 
 
@@ -268,13 +275,13 @@ def annotate_paths(
         if len(upstream_fastq) == len(downstream_fastq):
             # Some files can be paired
             if verbose:
-                console.print("We found pairs of files", style="green")
+                console.log("We found pairs of files", style="green")
             annotation["upstream_file"] = sorted(upstream_fastq + other_fastq)
             annotation["downstream_file"] = sorted(downstream_fastq)
 
         else:
             if verbose:
-                console.print(
+                console.log(
                     "Could not find any pairs of file(s) with confidence", style="green"
                 )
             annotation["upstream_file"] = sorted(fastq_read_sequences)
@@ -324,7 +331,7 @@ def guess_sample_id(
                 samples_id.append(remove_common_suffixes(up.name))
     else:
         for up in samples.upstream_file:
-            samples_id.append(remove_common_suffixes(name))
+            samples_id.append(remove_common_suffixes(up.name))
 
     return samples_id
 
@@ -338,12 +345,19 @@ def as_dataframe(
     """
     Format annotation table as required by pipelines
     """
-    samples = pandas.DataFrame.from_dict(
-        {
-            "upstream_file": annotated["upstream_file"],
-            "downstream_file": annotated["downstream_file"],
-        }
-    )
+    try:
+        samples = pandas.DataFrame.from_dict(
+            {
+                "upstream_file": annotated["upstream_file"],
+                "downstream_file": annotated["downstream_file"],
+            }
+        )
+    except ValueError:
+        samples = pandas.DataFrame.from_dict(
+            {
+                "upstream_file": annotated["upstream_file"],
+            }
+        )
     species, build, release = organism.split(".")
     samples["species"] = species
     samples["build"] = build
@@ -356,11 +370,11 @@ def as_dataframe(
     if verbose:
         shape: tuple[int] = samples.shape
         if shape[0] == 1:
-            console.print(
+            console.log(
                 f"{shape[0]} sample was identified and annotated.", style="green"
             )
         else:
-            console.print(
+            console.log(
                 f"{shape[0]} samples were identified and annotated.", style="green"
             )
 
@@ -377,7 +391,7 @@ def search_files_locally(
         path = Path(path)
 
     if verbose:
-        console.print(f"Searching in {path.resolve()}", style="green")
+        console.log(f"Searching in {path.resolve()}", style="green")
 
     for content in path.iterdir():
         if content.name in (".git", ".snakemake"):
@@ -389,8 +403,44 @@ def search_files_locally(
             )
 
         if verbose:
-            console.print(f"Found {content.resolve()}", style="green")
+            console.log(f"Found {content.resolve()}", style="green")
         yield content
+
+
+def search_files_on_iRODS(
+        project_id: str | list[str], verbose: bool, console: Console
+    ) -> Generator[Path, None, None]:
+    """
+    Yeld all available files on iRODS under the given project ID
+    """
+    ssl_settings = {}
+    env_file: str = Path('~/.irods/irods_environment.json').expanduser()
+    if not Path(env_file).exists():
+        raise FileNotFoundError(
+            f"Could not find {env_file=}. "
+            "Use `iinit` in your terminal."
+        )
+
+    if isinstance(project_id, str):
+        project_id = [project_id]
+
+    if verbose:
+        console.log(f"Searching for {project_id=} on iRODS")
+
+    for project in project_id:
+        with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
+            # iRODS query, this takes several seconds
+            collections: session.query = (
+                session.query(Collection, CollectionMeta)
+                       .filter(Criterion("=", CollectionMeta.name, "projectName"))
+                       .filter(Criterion("=", CollectionMeta.value, project))
+            )
+
+            # Parse query, this takes 2 seconds
+            for collection in collections:
+                for sub_coll in session.collections.get(collection[Collection.name]).subcollections:
+                    for dataset in sub_coll.data_objects:
+                        yield Path(dataset.path)
 
 
 @click.command(context_settings={"show_default": True})
@@ -467,17 +517,17 @@ def main(
     if irods == "None":
         file_list = sorted(search_files_locally(directory, verbose, console))
     else:
-        raise NotImplementedError("Sorry...")
+        file_list = sorted(search_files_on_iRODS(irods, verbose, console))
 
     try:
         annotated: dict[str, str] = annotate_paths(
             file_list, console=console, verbose=verbose
         )
     except FileNotFoundError:
-        console.print_exception(show_locals=True)
+        console.log_exception(show_locals=True)
         sys.exit(1)
     except ValueError:
-        console.print_exception(show_locals=True)
+        console.log_exception(show_locals=True)
         sys.exit(2)
 
     samples: pandas.DataFrame = as_dataframe(
@@ -488,11 +538,11 @@ def main(
     if not output.parent.exists():
         output.parent.mkdir(parents=True, exist_ok=True)
     if verbose:
-        console.print(samples)
+        console.log(samples)
     if (force) or (not output.exists()):
         samples.to_csv(output, sep=",", header=True, index=True)
     else:
-        console.print(":warning: Existing file not over-written", style="dark_orange")
+        console.log(":warning: Existing file not over-written", style="dark_orange")
 
 
 if __name__ == "__main__":
