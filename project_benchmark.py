@@ -247,6 +247,9 @@ def preprocess(
         )
         for data in pandas.Series(df.input_size_mb.explode())
     ]
+    
+    # Replace mem_mb by mem_gb if mem_gb is not NaN (because if mem_gb is used in rule, mem_mb takes the default value which is wrong)
+    df.loc[df["mem_gb"].notna(), "mem_mb"] = df["mem_gb"] * 1000
 
     # Efficiency
     df["efficiency"] = [
