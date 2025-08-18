@@ -99,7 +99,6 @@ def describe_rule(
         tmp = df[df["rule_name"] == rule_name].copy()
     else:
         tmp = df.copy()
-    tmp = tmp.describe()
 
     return {
         "mean_time": mean_time(tmp),
