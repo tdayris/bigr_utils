@@ -10,7 +10,7 @@ import sys
 from functools import partial
 from rich.console import Console
 from pathlib import Path
-
+from numpy import isnan
 
 def hhmmss(seconds: int | float) -> str:
     """
@@ -27,7 +27,6 @@ def nb(number: str | int | float) -> str:
         return f"{number:.2f}"
     return round(number, 2)
 
-
 def extract_text(
     df: pandas.DataFrame,
     colname: str,
@@ -41,28 +40,31 @@ def extract_text(
     """
     desc = df[[colname]].describe()
     val = nb(desc.loc[val][colname])
-    if (colname == "s") and (not seconds):
-        val = hhmmss(val)
-    elif colname == "runtime":
-        if seconds is True:
-            val = val * 60
-        else:
-            val = hhmmss(val * 60)
-
-    std = ""
-    if with_std is True:
-        std = nb(desc.loc["std"][colname])
+    if not isnan(val):
         if (colname == "s") and (not seconds):
-            std = hhmmss(std)
+            val = hhmmss(val)
         elif colname == "runtime":
             if seconds is True:
-                std = std * 60
+                val = val * 60
             else:
-                std = hhmmss(std * 60)
-    if std != "":
-        std = f"± {std}"
+                val = hhmmss(val * 60)
 
-    return f"""{val} {std} {unit}""".strip()
+        std = ""
+        if with_std is True and not isnan(desc.loc["std"][colname]):
+            std = nb(desc.loc["std"][colname])
+            if (colname == "s") and (not seconds):
+                std = hhmmss(std)
+            elif colname == "runtime":
+                if seconds is True:
+                    std = std * 60
+                else:
+                    std = hhmmss(std * 60)
+        if std != "":
+            std = f"± {std}"
+
+        return f"""{val} {std} {unit}""".strip()
+    else:
+    	return f""""""
 
 
 mean_time = partial(extract_text, colname="s", unit="")
@@ -99,7 +101,11 @@ def describe_rule(
         tmp = df[df["rule_name"] == rule_name].copy()
     else:
         tmp = df.copy()
-    tmp = tmp.describe()
+
+    if time_at_most(tmp, seconds=True) != "" and reserved_runtime(tmp, seconds=True) != "":
+        time_efficiency = nb(100 * float(time_at_most(tmp, seconds=True)) / max(float(reserved_runtime(tmp, seconds=True)), 1))
+    else:
+        time_efficiency = ""
 
     return {
         "mean_time": mean_time(tmp),
@@ -111,11 +117,7 @@ def describe_rule(
         "mean_memory_wasted": memory_wasted(tmp),
         "mean_efficiency": efficiency(tmp),
         "reserved_runtime": reserved_runtime(tmp),
-        "time_efficiency": nb(
-            100
-            * float(time_at_most(tmp, seconds=True))
-            / max(float(reserved_runtime(tmp, seconds=True)), 1)
-        ),
+        "time_efficiency": time_efficiency,
     }
 
 
@@ -247,6 +249,9 @@ def preprocess(
         )
         for data in pandas.Series(df.input_size_mb.explode())
     ]
+
+    # Replace mem_mb by mem_gb if mem_gb is not NaN (because if mem_gb is used in rule, mem_mb takes the default value which is wrong)
+    df.loc[df["mem_gb"].notna(), "mem_mb"] = df["mem_gb"] * 1000
 
     # Efficiency
     df["efficiency"] = [
